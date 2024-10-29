@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('price');
             $table->string('status');
+            $table->boolean('is_active')->default('true');
             $table->foreignId('category_id')->nullable()->constrained();
             $table->timestamps();
         });

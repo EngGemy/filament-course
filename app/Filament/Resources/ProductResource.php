@@ -38,6 +38,7 @@ class ProductResource extends Resource
             ->schema([
                 TextInput::make('name'),
                 TextInput::make('price'),
+                Forms\Components\Toggle::make('is_active'),
                 Select::make('category_id')
             ->relationship('category','name'),
                 Select::make('status')
@@ -49,7 +50,7 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextInputColumn::make('name'),
                 Tables\Columns\TextColumn::make('price')
                     ->sortable()
                 ->money('EGP'),
@@ -62,14 +63,9 @@ class ProductResource extends Resource
                             : null;
                     }),
 
-        TextColumn::make('status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'in stock' => 'gray',
-                        'sold out' => 'warning',
-                        'coming soon' => 'success',
-
-                    }),
+        Tables\Columns\SelectColumn::make('status')
+                ->options(self::$statuses),
+                Tables\Columns\ToggleColumn::make('is_active'),
                 TextColumn::make('created_at')
                 ->since()
 

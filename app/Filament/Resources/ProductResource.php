@@ -11,6 +11,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -49,16 +50,28 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('price'),
-                TextColumn::make('category.name'),
-                TextColumn::make('status')
+                Tables\Columns\TextColumn::make('price')
+                    ->sortable()
+                ->money('EGP'),
+                TextColumn::make('category.name')
+                    ->label('Category Name')
+                    ->alignment(Alignment::End)
+                    ->url(function (Product $product) {
+                        return $product->category_id
+                            ? CategoryResource::getUrl('edit', ['record' => $product->category_id])
+                            : null;
+                    }),
+
+        TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'in stock' => 'gray',
                         'sold out' => 'warning',
                         'coming soon' => 'success',
 
-                    })
+                    }),
+                TextColumn::make('created_at')
+                ->since()
 
             ])
             ->filters([

@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Wizard;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\Alignment;
@@ -21,7 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductResource extends Resource
-{
+{  protected static ?string $recordTitleAttribute = 'name';
 
     protected  static array $statuses =[
         'in stock' => 'in stock',
@@ -38,14 +39,30 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name'),
-                TextInput::make('price'),
-                Forms\Components\Toggle::make('is_active'),
-                Select::make('category_id')
-            ->relationship('category','name'),
-                Select::make('status')
-                    ->options(ProductResource::$statuses)
-            ]);
+                Wizard::make([
+                    Wizard\Step::make('Order')
+                        ->schema([
+                            TextInput::make('name')
+                                ->columnSpan(3),
+                        ]),
+                    Wizard\Step::make('Delivery')
+                        ->schema([
+                            TextInput::make('price'),
+                            Forms\Components\Toggle::make('is_active'),
+                        ]),
+                    Wizard\Step::make('Billing')
+                        ->schema([
+                            Select::make('category_id')
+                                ->relationship('category','name'),
+                            Select::make('status')
+                                ->options(ProductResource::$statuses)
+                        ]),
+                ])
+
+
+
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
@@ -59,11 +76,12 @@ class ProductResource extends Resource
                 TextColumn::make('category.name')
                     ->label('Category Name')
                     ->alignment(Alignment::End)
-                    ->url(function (Product $product) {
-                        return $product->category_id
-                            ? CategoryResource::getUrl('edit', ['record' => $product->category_id])
-                            : null;
-                    }),
+                    ->url(fn (Product $record): string =>CategoryResource::getUrl('edit',['record' => $record->category_id])),
+//                    ->url(function (AppCount $product) { //set URL or lnk for each row in coulmn
+//                        return $product->category_id
+//                            ? CategoryResource::getUrl('edit', ['record' => $product->category_id])
+//                            : null;
+//                    }),
 
         Tables\Columns\SelectColumn::make('status')
                 ->options(self::$statuses),
@@ -125,5 +143,10 @@ class ProductResource extends Resource
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name',   'category.name'];
     }
 }

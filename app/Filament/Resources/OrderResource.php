@@ -33,7 +33,7 @@ class OrderResource extends Resource
                 Forms\Components\Select::make('product_id')
                     ->relationship('product','name')
                     ->required()
-                    ->label('Product'),
+                    ->label('AppCount'),
                 Forms\Components\TextInput::make('price')
                 ->numeric()
                     ->label('Price')

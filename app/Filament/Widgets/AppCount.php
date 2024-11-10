@@ -18,3 +18,22 @@ class AppCount extends BaseWidget
         ];
     }
 }
+
+//user register
+//User Login
+//User view/update Profile /Password
+//Manage user's Vechiels
+//get prices for zones /area
+//Start/stop parking
+//view total price
+//**** payments
+
+
+//*** what are dealing with applications
+//Users
+//Cars/Vehicles
+//Parking Zones / area with itis prices
+//Parking Events strat:stop
+
+
+//
